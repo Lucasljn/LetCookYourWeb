@@ -1,0 +1,30 @@
+body {
+  background-color: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+}
+
+a {
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.custom-hr {
+  border: 0;
+  border-top: 2px solid #FF9F1C;
+  width: 70%;
+  margin: auto;
+  opacity: 0.4;
+}
+
+.custom-hr:hover {
+  border-top: 2px solid #FFB974;
+  opacity: 0.6;
+}
