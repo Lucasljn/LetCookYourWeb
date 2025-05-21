@@ -17,7 +17,8 @@ const appointmentSchema = new mongoose.Schema({
   name: String,
   email: String,
   service: String,
-  datetime: Date,
+  date: Date,
+  time: String,
 });
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
@@ -31,8 +32,8 @@ app.get('/api/appointments', async (req, res) => {
 });
 
 app.post('/api/appointments', async (req, res) => {
-  const {name, email, service, datetime} = req.body;
-  const newAppointment = new Appointment({name, email, service, datetime});
+  const {name, email, service, date, time} = req.body;
+  const newAppointment = new Appointment({name, email, service, date, time});
   try {
     await newAppointment.save();
     res.status(201).json(newAppointment);
@@ -42,9 +43,9 @@ app.post('/api/appointments', async (req, res) => {
 });
 
 app.get('/api/appointments/check', async (req, res) => {
-  const { datetime } = req.query;
+  const {name, email, service, date, time} = req.query;
   try {
-    const existingAppointment = await Appointment.findOne({ datetime });
+    const existingAppointment = await Appointment.findOne({name, email, service, date, time});
     if (existingAppointment) {
       return res.status(409).json({ message: 'Ce créneau est déjà réservé' });
     }
@@ -77,6 +78,35 @@ app.post('/api/reviews', async (req, res) => {
   try {
     await newReview.save();
     res.status(201).json(newReview);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+const commandesSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  site: String,
+  price: Number,
+  description: String,
+});
+const Commandes = mongoose.model("Commandes", commandesSchema);
+
+app.get('/api/commandes', async (req, res) => {
+  try {
+    const commandes = await Commandes.find();
+    res.json(commandes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post('/api/commandes', async (req, res) => {
+  const { name, email, site, price, description } = req.body;
+  const newCommandes = new Commandes({ name, email, site, price, description });
+  try {
+    await newCommandes.save();
+    res.status(201).json(newCommandes);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

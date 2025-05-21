@@ -1,4 +1,3 @@
-/* Style du formulaire */
 .booking-form {
     background-color: #ffffff;
     padding: 30px;
@@ -44,7 +43,6 @@
     background-color: #4a81b0;
   }
   
-  /* Calendrier */
   .calendar {
     margin-top: 20px;
   }
@@ -77,9 +75,15 @@
     text-align: center;
   }
   
+  .day-iter {
+    color: #121212;
+    text-align: center;
+    margin-bottom: -10px;
+  }
+
   .day-header {
     font-weight: 600;
-    color: #5D98D5;
+    color: #b6b3b3;
     font-size: 14px;
     text-align: center;
     margin-bottom: 10px;
@@ -104,6 +108,7 @@
     border-radius: 5px;
     padding: 8px;
     width: 100%;
+    color: #555353;
     text-align: center;
     font-weight: 600;
     cursor: pointer;
@@ -121,11 +126,12 @@
   }
   
   .time-slot.booked {
-    background-color: #d3d3d3;
+    background-color: #FFB974;
     cursor: not-allowed;
+    color: #ffffff;
+    text-decoration: line-through;
   }
   
-  /* Responsive design pour des écrans plus petits */
   @media (max-width: 768px) {
     .calendar-header {
       flex-direction: column;

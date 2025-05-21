@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import './BookingForm.css';
+import colors from '../constants/color';
 
 function BookingForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [service, setService] = useState('');
-  const [appointments, setAppointments] = useState([]); // Liste des rendez-vous existants
-  const [weekStartDate, setWeekStartDate] = useState(new Date()); // Date du début de la semaine
+  const [appointments, setAppointments] = useState([]);
+  const [weekStartDate, setWeekStartDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [site, setSite] = useState('');
+  const [price, setPrice] = useState('');
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -28,7 +34,7 @@ function BookingForm() {
       name,
       email,
       service,
-      date: weekStartDate,
+      date: new Date(selectedDate),
       time: selectedTime,
     };
   
@@ -44,94 +50,120 @@ function BookingForm() {
       if (response.ok) {
         const data = await response.json();
         console.log('Rendez-vous enregistré:', data);
+        setConfirmationMessage(`Votre rendez-vous a bien été pris le ${selectedDate} à ${selectedTime}.`);
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       } else {
-        console.error('Erreur lors de l\'enregistrement du rendez-vous');
+        setConfirmationMessage('Une erreur est survenue. Veuillez réessayer.');
       }
     } catch (err) {
-      console.log('Erreur de connexion au serveur:', err);
+      setConfirmationMessage('Erreur de connexion au serveur.');
     }
   };
+  
+
+  const handleCommandeSubmit = async (e) => {
+    e.preventDefault();
+    const commande = {
+      name,
+      email,
+      site,
+      price,
+      description,
+    };
+  
+    try {
+      const response = await fetch('http://localhost:5000/api/commandes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(commande),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Commande enregistrée:', data);
+        setConfirmationMessage("Votre commande a bien été envoyée !");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      } else {
+        setConfirmationMessage("Une erreur est survenue. Veuillez réessayer.");
+      }
+    } catch (err) {
+      setConfirmationMessage("Erreur de connexion au serveur.");
+    }
+  };
+  
 
   const navigateWeek = (direction) => {
     const newDate = new Date(weekStartDate);
-    newDate.setDate(newDate.getDate() + direction * 7); // Avance ou recule de 7 jours
+    newDate.setDate(newDate.getDate() + direction * 7);
     setWeekStartDate(newDate);
   };
-
-  // Vérifier la disponibilité d'un créneau horaire
+ 
   const isTimeAvailable = (date, time) => {
-    const datetime = new Date(`${date}T${time}`);
-    return !appointments.some((appointment) => new Date(appointment.datetime).getTime() === datetime.getTime());
-  };
-
-  // Sélectionner un créneau horaire
-  const handleTimeSelection = (time) => {
-    setSelectedTime(time);
-  };
-
-  // Formater la date du début de la semaine pour l'affichage
-  const formatWeekStartDate = () => {
-    const day = weekStartDate.getDate();
-    const month = weekStartDate.getMonth() + 1;
-    const year = weekStartDate.getFullYear();
-    return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
-  };
-
-  // Filtrer les créneaux horaires
-  const filterTimeSlots = (timeSlots) => {
-    return timeSlots.filter(time => {
-      // Exclure les créneaux entre 12h et 14h
-      const hour = parseInt(time.split(':')[0]);
-      if (hour >= 12 && hour < 14) return false;
-      
-      // Vérifier si le créneau est réservé
-      const selectedDateString = weekStartDate.toLocaleDateString();
-      return isTimeAvailable(selectedDateString, time);
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) return false;
+    const dateISO = parsedDate.toISOString().split('T')[0];
+    return !appointments.some((appointment) => {
+      const appointmentDate = new Date(appointment.date);
+      if (isNaN(appointmentDate)) return false;
+      const appointmentDateISO = appointmentDate.toISOString().split('T')[0];
+      return appointmentDateISO === dateISO && appointment.time === time;
     });
+  };
+
+  const consultBefore = (email) => {
+    return appointments.find((appointment) => appointment.email === email);
+  };
+
+  const handleTimeSelection = (time, dayDate) => {
+    setSelectedTime(time);
+    setSelectedDate(dayDate);
   };
 
   const renderCalendar = () => {
     const startTime = 9;
     const endTime = 18;
     const timeSlots = [];
-
     for (let hour = startTime; hour < endTime; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        timeSlots.push(time);
-      }
+      const time = `${hour.toString().padStart(2, '0')}:00`;
+      timeSlots.push(time);
     }
-
+  
     const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven'];
     const weekDates = [];
-
-    // Calculer les dates pour chaque jour de la semaine
     for (let i = 0; i < 5; i++) {
       const day = new Date(weekStartDate);
       day.setDate(weekStartDate.getDate() + i);
       weekDates.push(day);
     }
-
+  
     return (
       <div className="calendar">
         <div className="calendar-header">
-          <button onClick={() => navigateWeek(-1)} className="arrow-button">{'<'}</button>
-          <div className="week-title">{formatWeekStartDate()}</div>
-          <button onClick={() => navigateWeek(1)} className="arrow-button">{'>'}</button>
+          <button type="button" onClick={() => navigateWeek(-1)} className="arrow-button">{'<'}</button>
+          <button type="button" onClick={() => navigateWeek(1)} className="arrow-button">{'>'}</button>
         </div>
-
         <div className="calendar-body">
           {weekDays.map((_, dayIndex) => (
             <div key={dayIndex} className="day-column">
+              <div className="day-iter">{weekDays[dayIndex]}</div>
               <div className="day-header">{weekDates[dayIndex].toLocaleDateString()}</div>
-              {filterTimeSlots(timeSlots).map((time, index) => {
-                const isBooked = !isTimeAvailable(weekDates[dayIndex].toLocaleDateString(), time);
+              {timeSlots.map((time, index) => {
+                const currentDate = weekDates[dayIndex].toISOString();
+                const isBooked = !isTimeAvailable(weekDates[dayIndex], time);
+                const isSelected = selectedTime === time && selectedDate === currentDate;
                 return (
                   <button
+                    type="button"
                     key={index}
-                    className={`time-slot ${isBooked ? 'booked' : ''} ${selectedTime === time ? 'selected' : ''}`}
+                    className={`time-slot ${isBooked ? 'booked' : ''} ${isSelected ? 'selected' : ''}`}
                     disabled={isBooked}
-                    onClick={() => handleTimeSelection(time)}
+                    onClick={() => handleTimeSelection(time, currentDate)}
                   >
                     {time}
                   </button>
@@ -143,11 +175,17 @@ function BookingForm() {
       </div>
     );
   };
+  
 
   return (
     <div className="container py-5">
-      <h2 className="text-center mb-4">Prendre un rendez-vous</h2>
+      <h2 className="text-center mb-4">Choisissez un service</h2>
       <form onSubmit={handleSubmit} className="booking-form mx-auto" style={{ maxWidth: '800px' }}>
+        {confirmationMessage && (
+          <div className="alert alert-success text-center mb-4" role="alert">
+            {confirmationMessage}
+          </div>
+        )}
         <div className="form-group mb-3">
           <label htmlFor="name" className="form-label">Nom</label>
           <input
@@ -181,19 +219,90 @@ function BookingForm() {
           >
             <option value="">Choisir un service</option>
             <option value="Consultation">Consultation</option>
-            <option value="Formation">Formation</option>
-            <option value="Atelier">Atelier</option>
+            <option value="Commande">Passer commande</option>
           </select>
         </div>
+        {service === "Consultation" && (
+          <>
+            <div className="form-group mb-3">
+              <label htmlFor="time" className="form-label">Sélectionner une plage horaire</label>
+              {renderCalendar()}
+            </div>
+            {confirmationMessage && (
+              <div className="alert alert-success text-center mb-4" role="alert">
+                {confirmationMessage}
+              </div>
+            )}
+            <button type="submit" className="btn w-100" disabled={!selectedTime} style={{background: colors.blueLight, color: 'white'}}>
+              Réserver
+            </button>
+          </>
+        )}
+        {service === "Commande" && (
+          <>
+            {!email ? (
+              <div className="alert alert-warning text-center mb-4">
+                Veuillez entrer votre email pour vérifier votre consultation.
+              </div>
+            ) : !consultBefore(email) ? (
+              <div className="alert alert-warning text-center mb-4">
+                Aucun rendez-vous trouvé pour cet email.  
+                Veuillez réserver une <strong>consultation</strong> afin que nous puissions mieux comprendre vos attentes.
+              </div>
+            ) : (
+              <>
+                <div className="form-group mb-3">
+                  <label htmlFor="site" className="form-label">Nom du site</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="site"
+                    value={site}
+                    onChange={(e) => setSite(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group mb-3">
+                  <label htmlFor="price" className="form-label">Prix convenu (€)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    id="price"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group mb-3">
+                  <label htmlFor="description" className="form-label">Description</label>
+                  <textarea
+                    className="form-control"
+                    id="description"
+                    rows="4"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                  ></textarea>
+                </div>
+                {confirmationMessage && (
+                  <div className="alert alert-success text-center mb-4" role="alert">
+                    {confirmationMessage}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  className="btn w-100"
+                  onClick={handleCommandeSubmit}
+                  style={{background: colors.blueLight, color: 'white'}}
+                  disabled={!site || !price || !description}
+                >
+                  Envoyer la commande
+                </button>
+              </>
+            )}
+          </>
+        )}
 
-        <div className="form-group mb-3">
-          <label htmlFor="time" className="form-label">Sélectionner une plage horaire</label>
-          {renderCalendar()}
-        </div>
-
-        <button type="submit" className="btn btn-primary w-100" disabled={!selectedTime}>
-          Réserver
-        </button>
       </form>
     </div>
   );

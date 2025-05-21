@@ -11,14 +11,14 @@ function Services() {
           <p className="lead mb-5" style={{ color: '#dddddd' }}>
             Découvrez nos prestations pour vous aider à réussir en ligne.
           </p>
-          <div className="row">
+          <div className="row justify-content-center">
             <div className="col-lg-4 col-md-6 mb-4">
               <div className="card shadow-lg border-0 rounded-lg overflow-hidden" style={{ backgroundColor: '#1d1d1d' }}>
                 <img src="/assets/home/webdesign.png" alt="Web Design" className="card-img-top" />
                 <div className="card-body text-white">
                   <h5 className="card-title" style={{ color: colors.orangeLight }}>Consultations</h5>
                   <p className="card-text">
-                    Réservez une consultation personnalisée pour discuter de vos besoins en bien-être et santé.
+                    Réservez une consultation personnalisée pour discuter de votre prochain projet web.
                   </p>
                 </div>
               </div>
@@ -27,20 +27,9 @@ function Services() {
               <div className="card shadow-lg border-0 rounded-lg overflow-hidden" style={{ backgroundColor: '#1d1d1d' }}>
                 <img src="/assets/home/seo.png" alt="SEO" className="card-img-top" />
                 <div className="card-body text-white">
-                  <h5 className="card-title" style={{ color: colors.orangeLight }}>Formations</h5>
+                  <h5 className="card-title" style={{ color: colors.orangeLight }}>Commandes</h5>
                   <p className="card-text">
-                    Apprenez à prendre soin de votre bien-être au quotidien avec nos formations en naturopathie.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-4 col-md-6 mb-4">
-              <div className="card shadow-lg border-0 rounded-lg overflow-hidden" style={{ backgroundColor: '#1d1d1d' }}>
-                <img src="/assets/home/developpement.png" alt="Développement" className="card-img-top" />
-                <div className="card-body text-white">
-                  <h5 className="card-title" style={{ color: colors.orangeLight }}>Ateliers</h5>
-                  <p className="card-text">
-                    Participez à nos ateliers pratiques pour mieux comprendre les méthodes de soins naturels.
+                    Passez votre commande avec la plus grande simplicité suite a une consultation.
                   </p>
                 </div>
               </div>
