@@ -2,11 +2,15 @@
 
 Bienvenue sur **LetCookYourWeb**, notre plateforme de création d'applications web sur mesure.
 
+Lucas Lejeune
+Clement Boudon
+
 ---
 
 ## 🧩 Description
 
 **LetCookYourWeb** est un site vitrine moderne permettant à des clients de :
+
 - Découvrir nos services de développement web.
 - Prendre rendez-vous en ligne pour discuter de leur projet.
 - Commander directement une prestation de création de site ou d'application.
@@ -45,3 +49,4 @@ Ce projet a été développé avec une architecture complète **frontend + backe
 ```bash
 git clone https://github.com/username/letcookyourweb.git
 cd letcookyourweb
+```
