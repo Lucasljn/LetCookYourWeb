@@ -1,10 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config();
+const adminRoutes = require('./routes/admin');
+const auth = require('./middleware/auth');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use('/api/admin', adminRoutes);
 
 mongoose.connect('mongodb://localhost:27017/letcookyourweb', {
   useNewUrlParser: true,
@@ -39,6 +43,15 @@ app.post('/api/appointments', async (req, res) => {
     res.status(201).json(newAppointment);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+app.delete('/api/admin/appointments/:id', auth, async (req, res) => {
+  try {
+    await Appointment.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Rendez-vous supprimé' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -92,13 +105,9 @@ const commandesSchema = new mongoose.Schema({
 });
 const Commandes = mongoose.model("Commandes", commandesSchema);
 
-app.get('/api/commandes', async (req, res) => {
-  try {
-    const commandes = await Commandes.find();
-    res.json(commandes);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+app.get('/api/admin/commandes', auth, async (req, res) => {
+  const commandes = await Commandes.find();
+  res.json(commandes);
 });
 
 app.post('/api/commandes', async (req, res) => {
@@ -109,6 +118,15 @@ app.post('/api/commandes', async (req, res) => {
     res.status(201).json(newCommandes);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+app.delete('/api/admin/commandes/:id', auth, async (req, res) => {
+  try {
+    await Commandes.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Commande supprimée' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

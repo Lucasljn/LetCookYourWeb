@@ -6,6 +6,10 @@ import Services from './pages/Services';
 import Portfolio from './pages/Portfolio';
 import Contact from './pages/Contact';
 import Footer from './components/Footer';
+import AdminLogin from './admin/pages/Login';
+import AdminIndex from './admin/pages/AdminIndex';
+import AdminDashboard from './admin/pages/Dashboard';
+
 import './index.css';
 
 function App() {
@@ -18,6 +22,9 @@ function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/admin" element={<AdminIndex />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
       <Footer />
